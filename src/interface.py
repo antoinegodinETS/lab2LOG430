@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 from magasin.services import (
-    consulter_stock_magasin, performances_magasin, generer_performances_magasin
+    consulter_stock_magasin, performances_magasin, generer_performances_magasin, vendre_produit
 )
 from logistique.services import (
     consulter_stock_logistique, creer_demande_approvisionnement, verifier_et_reapprovisionner,
@@ -116,7 +116,6 @@ async def execute_action(request: Request):
     action = form_data.get("action")
     section = form_data.get("section", None)
     demandes = db.query(DemandeApprovisionnement).filter_by(statut="en_attente").all()
-    print(">>> DEMANDES TROUVÉES :", demandes)
 
 
     result = None
@@ -144,6 +143,13 @@ async def execute_action(request: Request):
         elif action == "consulter_stock_magasin":
             magasin_id = int(form_data.get("magasin_id"))
             stock_magasin = consulter_stock_magasin(magasin_id)
+        
+        elif action == "vendre_produit":
+            produit_id = int(form_data.get("produit_id"))
+            quantite = int(form_data.get("quantite"))
+            magasin_id = int(form_data.get("magasin_id"))
+            result = vendre_produit(magasin_id, produit_id, quantite)
+
 
         else:
             result = "Action non reconnue."

@@ -54,3 +54,36 @@ def consulter_stock_magasin(magasin_id: int):
         for stock_entry, produit in stock
     ]
     return stock_info
+
+def vendre_produit(magasin_id: int, produit_id: int, quantite: int) -> str:
+    db = SessionLocal()
+    
+    try:
+        stock = db.query(StockMagasin).filter_by(
+            magasin_id=magasin_id,
+            produit_id=produit_id
+        ).first()
+        
+        for s in stock:
+            print(s.produit_id, s.quantite)
+
+        if stock is None:
+            return f"Erreur : Le produit {produit_id} n'existe pas dans le stock du magasin {magasin_id}."
+
+        if quantite <= 0:
+            return "Erreur : La quantité doit être positive."
+
+        if stock.quantite < quantite:
+            return f"Erreur : Stock insuffisant. Disponible : {stock.quantite}, demandé : {quantite}."
+
+        # Mise à jour du stock
+        stock.quantite -= quantite
+        db.commit()
+        return f"✅ Vente réussie de {quantite} unité(s) du produit {produit_id} par le magasin {magasin_id}."
+
+    except Exception as e:
+        db.rollback()
+        return f"Erreur inattendue : {str(e)}"
+
+    finally:
+        db.close()

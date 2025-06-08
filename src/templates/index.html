@@ -162,6 +162,23 @@
             {% endfor %}
         </table>
         {% endif %}
+        <h3>Vendre un produit</h3>
+        <form action="/execute" method="post">
+            <input type="hidden" name="action" value="vendre_produit">
+            <input type="hidden" name="section" value="magasin">
+
+            <label for="produit_id_vente">ID du produit :</label>
+            <input type="number" name="produit_id" id="produit_id_vente" required>
+
+            <label for="quantite_vente">Quantité :</label>
+            <input type="number" name="quantite" id="quantite_vente" required>
+
+            <label for="magasin_id_vente">ID du magasin :</label>
+            <input type="number" name="magasin_id" id="magasin_id_vente" required>
+
+            <button type="submit">Vendre</button>
+        </form>
+
     </div>
 
     <div id="logistique" class="action-section" style="display:none">

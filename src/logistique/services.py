@@ -15,8 +15,6 @@ def creer_demande_approvisionnement(magasin_id: int, produit_id: int, quantite: 
     )
     db.add(demande)
     db.commit()
-    demandes = db.query(DemandeApprovisionnement).filter_by(statut="en_attente").all()
-    print(">>> DEMANDES TROUVÉES :", demandes)
     db.close()
     return "Demande envoyée au centre logistique."
 
