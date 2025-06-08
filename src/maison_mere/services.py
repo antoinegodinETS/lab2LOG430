@@ -47,3 +47,43 @@ def mettre_a_jour_produit(produit_id, nouvelles_infos):
     session.commit()
     session.close()
     return True
+
+
+def generer_performances():
+    session: Session = SessionLocal()
+
+    # Chiffre d'affaires par magasin
+    chiffre_affaires = (
+        session.query(Vente.magasin_id, func.sum(Vente.prix_unitaire * Vente.quantite).label("total"))
+        .group_by(Vente.magasin_id)
+        .all()
+    )
+
+    # Produits en rupture de stock (quantite <= 5)
+    ruptures = (
+        session.query(StockMagasin)
+        .filter(StockMagasin.quantite <= 5)
+        .all()
+    )
+
+    # Produits en surstock (quantite >= 100)
+    surstocks = (
+        session.query(StockMagasin)
+        .filter(StockMagasin.quantite >= 100)
+        .all()
+    )
+
+    # Tendances hebdomadaires : nombre de ventes par magasin (sans date → simule par total par magasin)
+    tendances = (
+        session.query(Vente.magasin_id, func.count(Vente.id).label("nombre_ventes"))
+        .group_by(Vente.magasin_id)
+        .all()
+    )
+
+    session.close()
+    return {
+        "chiffre_affaires": chiffre_affaires,
+        "ruptures": ruptures,
+        "surstocks": surstocks,
+        "tendances": tendances
+    }

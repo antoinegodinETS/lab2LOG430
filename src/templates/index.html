@@ -36,17 +36,15 @@
             <button type="submit">Générer rapport des ventes</button>
         </form>
 
-        <form method="post" action="/execute">
+        <form method="get" action="/performances">
             <input type="hidden" name="action" value="performances">
             <input type="hidden" name="section" value="maison_mere">
             <button type="submit">Visualiser performances magasins</button>
         </form>
 
-        <form method="post" action="/execute">
+        <form method="get" action="/maj_produit">
             <input type="hidden" name="action" value="maj_produit">
             <input type="hidden" name="section" value="maison_mere">
-            <label>ID produit:</label><input name="produit_id" type="text">
-            <label>Nouvelles infos (JSON):</label><input name="nouvelles_infos" type="text">
             <button type="submit">Mettre à jour produit</button>
         </form>
         {% if result.ventes_par_magasin %}

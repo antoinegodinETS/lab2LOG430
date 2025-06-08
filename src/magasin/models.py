@@ -1,6 +1,7 @@
-# magasin/models.py
 from sqlalchemy import Column, ForeignKey, Integer, String, Float
+from sqlalchemy.orm import relationship
 from common.database import Base
+from maison_mere.models import Vente
 
 class Magasin(Base):
     __tablename__ = "magasins"
@@ -20,14 +21,15 @@ class StockMagasin(Base):
     produit_id = Column(Integer)
     quantite = Column(Integer)
     
+    
 class Produit(Base):
     __tablename__ = "produits"
 
     id = Column(Integer, primary_key=True, index=True)
-    nom = Column(String, nullable=False)
+    nom = Column(String)
+    prix = Column(Float)
     description = Column(String)
-    prix = Column(Float, nullable=False)
 
-    def __repr__(self):
-        return f"<Produit(nom={self.nom}, prix={self.prix})>"
+    ventes = relationship(Vente, back_populates="produit")
+
 
