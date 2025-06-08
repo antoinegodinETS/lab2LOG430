@@ -1,8 +1,24 @@
-from logistique.models import StockLogistique
+from logistique.models import DemandeApprovisionnement, StockLogistique
 from magasin.models import Produit, StockMagasin
 from common.database import SessionLocal
 
 SEUIL_MINIMUM = 20  # ajustable si besoin
+
+
+def creer_demande_approvisionnement(magasin_id: int, produit_id: int, quantite: int):
+    db = SessionLocal()
+    demande = DemandeApprovisionnement(
+        magasin_id=magasin_id,
+        produit_id=produit_id,
+        quantite=quantite,
+        statut="en_attente"
+    )
+    db.add(demande)
+    db.commit()
+    demandes = db.query(DemandeApprovisionnement).filter_by(statut="en_attente").all()
+    print(">>> DEMANDES TROUVÉES :", demandes)
+    db.close()
+    return "Demande envoyée au centre logistique."
 
 def approvisionner_magasin(produit_id, quantite, magasin_id):
     session = SessionLocal()
@@ -69,3 +85,13 @@ def consulter_stock_logistique():
     
     session.close()
     return stock_info
+
+
+def recuperer_demandes_en_attente():
+    db = SessionLocal()
+    demandes = db.query(DemandeApprovisionnement).filter_by(validee=False).all()
+    for demande in demandes:
+        _ = demande.produit.nom  # force lazy-loading pour le template
+        _ = demande.magasin.nom
+    db.close()
+    return demandes

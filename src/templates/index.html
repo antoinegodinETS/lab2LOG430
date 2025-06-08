@@ -166,13 +166,19 @@
 
     <div id="logistique" class="action-section" style="display:none">
         <h2>Actions Logistique</h2>
-        <form method="post" action="/execute">
-            <input type="hidden" name="action" value="approvisionner">
-            <input type="hidden" name="section" value="logistique">
-            <label>ID produit:</label><input name="produit_id" type="text">
-            <label>Quantité:</label><input name="quantite" type="number">
-            <button type="submit">Approvisionner un magasin</button>
+        <form method="get" action="/demande_appro">
+            <input type="hidden" name="action" value="demande_appro">
+            <button type="submit">Demander approvisionnement</button>
         </form>
+        {% for demande in demandes %}
+        <p>Demande magasin {{ demande.magasin.nom }} : {{ demande.quantite }} x {{ demande.produit.nom }}</p>
+        <form method="post" action="/valider_demande">
+            <input type="hidden" name="demande_id" value="{{ demande.id }}">
+            <button type="submit">Valider</button>
+        </form>
+        {% endfor %}
+
+
     </div>
 </body>
 
