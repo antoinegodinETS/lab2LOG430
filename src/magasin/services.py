@@ -1,5 +1,6 @@
 from common.database import SessionLocal
-from maison_mere.models import Vente, Produit
+from magasin.models import Produit, StockMagasin
+from maison_mere.models import Vente
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 
@@ -24,3 +25,24 @@ def generer_rapport_ventes():
         })
     session.close()
     return rapport
+
+
+def consulter_stock_magasin(magasin_id: int):
+    session = SessionLocal()
+    stock = (
+        session.query(StockMagasin, Produit)
+        .join(Produit, StockMagasin.produit_id == Produit.id)
+        .filter(StockMagasin.magasin_id == magasin_id)
+        .all()
+    )
+    session.close()
+
+    stock_info = [
+        {
+            "produit_id": produit.id,
+            "nom": produit.nom,
+            "quantite": stock_entry.quantite
+        }
+        for stock_entry, produit in stock
+    ]
+    return stock_info
