@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src"
 
 import pytest
 from common.database import init_db, SessionLocal
-from magasin.models import Produit, StockMagasin
+from magasin.models import Magasin, Produit, StockMagasin
 from maison_mere.models import Vente
 from logistique.models import DemandeApprovisionnement, StockLogistique
 from sqlalchemy.orm import declarative_base
@@ -48,19 +48,28 @@ def test_ajout_produit(setup_database):
 
 def test_enregistrement_vente(setup_database):
     session = SessionLocal()
+
+    # Ajout du magasin requis
+    magasin = Magasin(nom="Magasin Test", quartier="Centre-ville")
+    session.add(magasin)
+    session.commit()
+
+    # Ajout du produit
     produit = Produit(nom="ProduitVente", prix=5.0, description="Produit pour vente")
     session.add(produit)
     session.commit()
 
-    stock = StockMagasin(magasin_id=1, produit_id=produit.id, quantite=10)
+    # Ajout du stock lié au magasin créé
+    stock = StockMagasin(magasin_id=magasin.id, produit_id=produit.id, quantite=10)
     session.add(stock)
     session.commit()
 
-    vente = Vente(magasin_id=1, produit_id=produit.id, quantite=3, montant=15.0)
+    # Ajout d'une vente liée au même magasin et produit
+    vente = Vente(magasin_id=magasin.id, produit_id=produit.id, quantite=3, montant=15.0)
     session.add(vente)
     session.commit()
 
-    # Mettre à jour la quantité dans le stock
+    # Mise à jour de la quantité
     stock.quantite -= vente.quantite
     session.commit()
 
