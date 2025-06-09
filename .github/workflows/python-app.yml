@@ -81,4 +81,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/log430-Lab2:${{ secrets.DOCKER_USERNAME }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/log430-lab2:${{ secrets.DOCKER_USERNAME }}
