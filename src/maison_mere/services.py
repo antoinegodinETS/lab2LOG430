@@ -87,3 +87,6 @@ def generer_performances():
         "surstocks": surstocks,
         "tendances": tendances
     }
+
+
+    

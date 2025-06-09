@@ -1,40 +1,36 @@
-# ADR – Choix du mécanisme de base de données
+# ADR – Choix de PostgreSQL comme moteur de base de données
 
-## Statut
-Décision prise – 21 mai 2025
+## Statut  
+Décision prise – 9 juin 2025
 
-## Contexte
-Le système à développer est une application de caisse (POS) locale destinée à un petit magasin de quartier.  
-L’application doit être simple, portable et rapide à déployer/tester pour un contexte de laboratoire.
+## Contexte  
+Le projet a évolué pour gérer **plusieurs magasins**, un **centre logistique** et une **maison mère**, avec des besoins en **synchronisation des données**, **transactions concurrentes** et **consultation centralisée**.  
+Le système n’est plus mono-instance mais repose sur une architecture modulaire avec des interactions entre services.  
 
-Plusieurs options de base de données existent :
-- **SQL local (ex: SQLite)**
-- **SQL client/serveur (ex: PostgreSQL)**
-- **NoSQL (ex: MongoDB, local ou distant)**
+Le moteur de base de données doit permettre :
+- Une gestion robuste des transactions concurrentes
+- Des connexions réseau (accès client/serveur)
+- Un bon support de requêtes complexes et jointures
+- Une capacité de montée en charge raisonnable
 
-## Décision
-Nous avons choisi **SQLite**, en configuration **locale**, comme mécanisme de base de données.
+## Décision  
+Nous avons choisi **PostgreSQL** comme base de données principale pour le système.
 
 ### Raisons principales :
-- **Simplicité** : Pas besoin d’installer/configurer un serveur. Un seul fichier local à manipuler.
-- **Portabilité** : Fonctionne partout, facilement intégré dans un conteneur Docker. Aucun prérequis logiciel lourd.
-- **Localité** : Toute la base de données reste sur la même machine que l’application, ce qui simplifie le développement, la gestion et le déploiement, particulièrement pour un laboratoire ou une démonstration.
-- **Intégration** : Support natif ou via ORM dans tous les langages courants (Python, Java, Node.js, etc.).
-- **Fiabilité** : Transactions ACID, parfaite pour garantir la cohérence des ventes/stock.
-- **Adapté à la charge** : Suffisant pour un magasin local avec peu de concurrence.
+- **Robustesse transactionnelle** : PostgreSQL garantit l’ACID, essentiel pour les opérations critiques comme les ventes, les mouvements de stock et les validations.
+- **Support client/serveur** : Chaque entité (magasin, logistique, maison mère) peut se connecter à un serveur PostgreSQL central ou conteneurisé, ce qui facilite la **centralisation** des données.
+- **Compatibilité ORM** : Excellent support avec SQLAlchemy, ce qui permet de conserver la même couche d’abstraction que dans Lab 1.
+- **Évolutivité** : PostgreSQL est adapté pour monter en charge, même dans un contexte futur de déploiement cloud ou web/mobile.
+- **Requêtes avancées** : Permet d’agréger facilement les données pour les rapports consolidés, les tableaux de bord (UC1, UC3), et les alertes.
 
-Nous avons écarté :
-- **PostgreSQL/MySQL** : Trop lourd pour un contexte local de laboratoire ; inutilement complexe pour une seule machine.
-- **NoSQL** : Moins naturel pour des opérations transactionnelles classiques (ventes, stocks) et moins intuitif pour un modèle de données tabulaire.
-- **Bases de données distantes ou en mode client/serveur** : Surdimensionné, ajoute de la complexité réseau inutile dans le contexte local du laboratoire.
+## Conséquences  
+- Le projet doit maintenant inclure un service PostgreSQL (via `docker-compose`) ou pointer vers un serveur PostgreSQL.
+- Les scripts de création de base et les modèles SQLAlchemy doivent être compatibles PostgreSQL.
+- L’intégration en CI/CD doit prévoir une BDD PostgreSQL pour les tests.
+- Le déploiement en environnement de prod/test nécessite une configuration réseau plus rigoureuse (ports, credentials, etc.).
 
-## Conséquences
-- Le schéma de la base sera relationnel (tables : Produits, Ventes, Utilisateurs…).
-- Les accès se feront via un ORM (ex : SQLAlchemy).
-- Le projet sera facile à cloner et exécuter (rien à installer côté BDD).
-- Si évolution future : Facile de migrer le schéma vers une BDD plus puissante (PostgreSQL) si besoin.
-
-## Alternatives envisagées mais rejetées
-- **MongoDB** : Non adapté au besoin transactionnel ; surdimensionné pour ce cas d’usage.
-- **MySQL/PostgreSQL** : Plus complexe à installer/maintenir pour ce laboratoire.
-- **Base distante** : Complexité réseau inutile dans le contexte local du projet.
+## Alternatives envisagées mais rejetées  
+- **SQLite** : Trop limité pour la gestion concurrente et les connexions multi-sources. Inadéquat pour la centralisation des magasins/logistique.
+- **MongoDB** : Moins adapté pour des opérations SQL relationnelles et des contraintes fortes d’intégrité.
+- **MySQL** : Comparable à PostgreSQL, mais PostgreSQL est mieux outillé pour des opérations complexes (ex : `CTE`, JSONB, transactions imbriquées).
+- **Base cloud externe** : Rejetée pour des raisons de simplicité, de coût et de dépendance à Internet dans un contexte local de VM.

@@ -7,8 +7,8 @@ from magasin.services import (
     consulter_stock_magasin, performances_magasin, generer_performances_magasin, vendre_produit
 )
 from logistique.services import (
-    consulter_stock_logistique, creer_demande_approvisionnement, verifier_et_reapprovisionner,
-    approvisionner_magasin, recuperer_demandes_en_attente
+    consulter_stock_logistique, creer_demande_approvisionnement,
+    approvisionner_magasin
 )
 
 

@@ -12,8 +12,4 @@ Base = declarative_base(metadata=MetaData(schema="lab2_schema"))
 
 
 def init_db():
-    from magasin.models import Produit
-    from logistique.models import StockLogistique
-    from maison_mere.models import Vente
-
     Base.metadata.create_all(bind=engine)

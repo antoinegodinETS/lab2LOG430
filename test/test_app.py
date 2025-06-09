@@ -1,52 +1,83 @@
-from db import init_db
-from repository import ajouter_produit, lister_produits, enregistrer_vente, annuler_vente, lister_ventes
 import sys
 import os
-sys.path.insert(
-    0,
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            '../src')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
+import pytest
+from common.database import init_db, SessionLocal
+from magasin.models import Produit, StockMagasin
+from maison_mere.models import Vente
+from logistique.models import DemandeApprovisionnement, StockLogistique
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.schema import MetaData
 
-def setup_module(module):
-    # Nettoyer la base de données avant chaque module de tests
-    if os.path.exists("pos.db"):
-        os.remove("pos.db")
-    init_db()
+Base = declarative_base(metadata=MetaData(schema="lab2_schema"))
 
+@pytest.fixture(scope="function")
+def setup_database():
+    # Réinitialise la base de données avant chaque test
+    session = SessionLocal()
+    session.query(DemandeApprovisionnement).delete()
+    session.query(Vente).delete()
+    session.query(StockMagasin).delete()
+    session.query(StockLogistique).delete()
+    session.query(Produit).delete()
+    session.commit()
+    session.close()
+    init_db()  # Réinitialiser la structure de la base de données
+    yield
+    # Nettoyage après chaque test
+    session = SessionLocal()
+    session.query(DemandeApprovisionnement).delete()
+    session.query(Vente).delete()
+    session.query(StockMagasin).delete()
+    session.query(StockLogistique).delete()
+    session.query(Produit).delete()
+    session.commit()
+    session.close()
 
-def test_ajout_produit():
-    ajouter_produit("TestProduit", "TestCat", 2.5, 10)
-    produits = lister_produits()
-    assert any(p.nom == "TestProduit" for p in produits)
+def test_ajout_produit(setup_database):
+    session = SessionLocal()
+    produit = Produit(nom="TestProduit", prix=10.0, description="Produit de test")
+    session.add(produit)
+    session.commit()
 
+    produits = session.query(Produit).all()
+    assert len(produits) == 1
+    assert produits[0].nom == "TestProduit"
+    session.close()
 
-def test_enregistrer_vente_et_stock():
-    ajouter_produit("Pomme", "Fruit", 1.0, 10)
-    produits = lister_produits()
-    produit_pomme = next(p for p in produits if p.nom == "Pomme")
-    ok, msg = enregistrer_vente([(produit_pomme.id, 3)], caisse_num=1)
-    assert ok
-    # Vérifie que le stock a décrémenté
-    produits = lister_produits()
-    pomme = next(p for p in produits if p.nom == "Pomme")
-    assert pomme.stock == 7
+def test_enregistrement_vente(setup_database):
+    session = SessionLocal()
+    produit = Produit(nom="ProduitVente", prix=5.0, description="Produit pour vente")
+    session.add(produit)
+    session.commit()
 
+    stock = StockMagasin(magasin_id=1, produit_id=produit.id, quantite=10)
+    session.add(stock)
+    session.commit()
 
-def test_annuler_vente():
-    ajouter_produit("Baguette", "Boulangerie", 2.0, 5)
-    produit = next(p for p in lister_produits() if p.nom == "Baguette")
-    ok, msg = enregistrer_vente([(produit.id, 2)], caisse_num=1)
-    ventes = lister_ventes()
-    vente_id = ventes[-1].id
-    ok, msg = annuler_vente(vente_id)
-    assert ok
-    # Vérifie que la vente est annulée
-    ventes = lister_ventes()
-    vente = next(v for v in ventes if v.id == vente_id)
-    assert vente.annulee
-    # Vérifie que le stock a été remis à jour
-    produit = next(p for p in lister_produits() if p.nom == "Baguette")
-    assert produit.stock == 5
+    vente = Vente(magasin_id=1, produit_id=produit.id, quantite=3, montant=15.0)
+    session.add(vente)
+    session.commit()
+
+    # Mettre à jour la quantité dans le stock
+    stock.quantite -= vente.quantite
+    session.commit()
+
+    stock_apres_vente = session.query(StockMagasin).filter_by(produit_id=produit.id).first()
+    assert stock_apres_vente.quantite == 7
+    session.close()
+
+def test_consulter_stock_logistique(setup_database):
+    session = SessionLocal()
+    produit = Produit(nom="ProduitLogistique", prix=20.0, description="Produit logistique")
+    session.add(produit)
+    session.commit()
+
+    stock_logistique = StockLogistique(produit_id=produit.id, quantite=50)
+    session.add(stock_logistique)
+    session.commit()
+
+    stock = session.query(StockLogistique).filter_by(produit_id=produit.id).first()
+    assert stock.quantite == 50
+    session.close()

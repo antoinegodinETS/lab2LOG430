@@ -9,6 +9,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copie le code source
 COPY src/ src/
+COPY .flake8 .flake8  
 
-# Par défaut, lance le programme principal
-CMD ["python", "src/main.py"]
+# Expose le port pour FastAPI
+EXPOSE 8000
+
+# Par défaut, lance le serveur FastAPI avec Uvicorn
+CMD ["uvicorn", "src.interface:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

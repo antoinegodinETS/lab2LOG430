@@ -31,5 +31,3 @@ class Produit(Base):
     description = Column(String)
 
     ventes = relationship(Vente, back_populates="produit")
-
-

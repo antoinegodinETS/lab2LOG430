@@ -9,6 +9,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: lab2user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: lab2db
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -29,6 +38,8 @@ jobs:
           flake8 src test
 
       - name: Run tests
+        env:
+          DATABASE_URL: postgresql+psycopg://lab2user:password@localhost/lab2db
         run: |
           source venv/bin/activate
           PYTHONPATH=src python -m pytest

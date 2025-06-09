@@ -40,3 +40,16 @@ Les autres plateformes n’ont pas été retenues car :
 - **Java** : Trop lourd et verbeux pour un projet simple en console.
 - **Node.js** : Moins adapté à une interface utilisateur en ligne de commande.
 - **Go / Rust** : Trop bas niveau pour le contexte du laboratoire, complexité inutile.
+
+## Mise à jour – 9 juin 2025
+
+Bien que le choix initial ait été fait dans le cadre d’une application console locale (Lab 1), le projet a évolué vers une architecture modulaire utilisant FastAPI avec PostgreSQL (Lab 2).  
+Le choix de **Python 3** reste toutefois pertinent, car :
+
+- Il s’intègre très bien avec **FastAPI**, SQLAlchemy et la conteneurisation.
+- Il permet de maintenir une **cohérence de langage** sur tous les modules (maison mère, magasin, logistique).
+- Il simplifie le déploiement grâce aux outils comme `uvicorn`, `pytest`, et `docker-compose`.
+
+Les conséquences techniques ont été ajustées :
+- Utilisation de **PostgreSQL** au lieu de SQLite.
+- Présence d’une **interface web minimale** plutôt qu’un simple CLI.

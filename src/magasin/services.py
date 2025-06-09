@@ -1,7 +1,6 @@
 from common.database import SessionLocal
 from magasin.models import Produit, StockMagasin
 from maison_mere.models import Vente
-from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 
 def performances_magasin():

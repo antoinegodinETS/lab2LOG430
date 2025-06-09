@@ -1,11 +1,5 @@
 # reset_db.py
 from common.database import Base, engine
-from magasin.models import Magasin, StockMagasin
-from logistique.models import StockLogistique
-from maison_mere.models import Vente
-from logistique.models import DemandeApprovisionnement
-from magasin.models import Produit, Magasin, StockMagasin
-from maison_mere.models import Vente
 
 print("Suppression et création des tables...")
 Base.metadata.drop_all(bind=engine)
