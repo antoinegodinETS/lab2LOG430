@@ -21,7 +21,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432" # Expose le port 5432 pour PostgreSQL
+      - "5433:5433" # Expose le port 5432 pour PostgreSQL
 
 volumes:
   postgres_data:

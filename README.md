@@ -1,24 +1,24 @@
-# Système de caisse POS (Python/SQLite)
+# Système de gestion de caisse POS (Python/FastAPI/PostgreSQL)
 
-Une application console Python pour la gestion de caisse d’un magasin local, avec persistance des données via SQLite et interface simple.
+Une application web Python pour la gestion de caisse d’un magasin local, avec persistance des données via PostgreSQL et interface moderne basée sur FastAPI.
 
 ---
 
 ## Démarrage rapide
 
-**Installer les dépendances :**
+### **Installer les dépendances :**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**Lancer l’application :**
+### **Lancer l’application localement :**
 ```bash
-python src/main.py
+uvicorn src.interface:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-**(Optionnel) Lancer avec Docker :**
+### **Lancer avec Docker :**
 ```bash
 docker-compose up --build
 ```
@@ -38,17 +38,17 @@ docker-compose up --build
 │       ├── ADR_Choix_Base_Donnees.md
 │       └── ADR_Choix_Plateforme.md
 ├── src/                   # Code source principal de l’application
-│   ├── db.py
-│   ├── main.py
-│   ├── models.py
-│   └── repository.py
+│   ├── interface.py       # Interface FastAPI
+│   ├── models/            # Modèles SQLAlchemy
+│   ├── services/          # Logique métier
+│   ├── common/            # Configuration et utilitaires
+│   └── database.py        # Configuration de la base de données
 ├── test/                  # Tests unitaires (pytest)
 │   └── test_app.py
 ├── .gitignore             # Fichiers/dossiers à ignorer par git
 ├── docker-compose.yml     # Orchestration Docker Compose
 ├── Dockerfile             # Image Docker de l’application
 ├── LICENSE                # Licence MIT
-├── pos.db                 # Base de données SQLite (générée à l’exécution)
 ├── README.md              # Documentation du projet
 ├── requirements.txt       # Dépendances Python
 ```
@@ -61,9 +61,10 @@ docker-compose up --build
 - Enregistrement et annulation de ventes
 - Gestion du stock en temps réel
 - Historique des ventes
-- Interface console simple et claire
-- Persistance locale via SQLite
+- Interface web moderne avec FastAPI
+- Persistance via PostgreSQL
 - Prise en charge multi-caisses
+- Déploiement avec Docker et Docker Compose
 
 ---
 
@@ -78,6 +79,7 @@ Le workflow se trouve dans `.github/workflows/python-app.yml`.
 - **Étapes principales** :
   - Installation des dépendances (`pip install -r requirements.txt`)
   - Exécution des tests unitaires (pytest)
+  - Initialisation de la base de données PostgreSQL
   - Build et publication de l’image Docker (si les tests passent)
 
 ---
@@ -85,8 +87,9 @@ Le workflow se trouve dans `.github/workflows/python-app.yml`.
 ## Choix techniques
 
 - **Python 3** : Rapidité de développement, lisibilité, large communauté
+- **FastAPI** : Framework moderne pour créer des API web rapides et performantes
 - **SQLAlchemy** : ORM pour simplifier la gestion de la base de données
-- **SQLite** : Base de données locale, simple et portable
+- **PostgreSQL** : Base de données robuste et adaptée aux environnements multi-utilisateurs
 - **pytest** : Tests unitaires
 - **Docker & Docker Compose** : Portabilité et reproductibilité de l’environnement
 - **GitHub Actions** : CI/CD intégré et automatisé
