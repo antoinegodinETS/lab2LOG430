@@ -22,4 +22,3 @@ def init_db():
 
     # Crée les tables dans le schéma
     Base.metadata.create_all(bind=engine)
-
