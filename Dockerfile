@@ -3,7 +3,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Copie les dépendances
+# Installe les dépendances système nécessaires pour psycopg[c]
+RUN apt-get update && apt-get install -y gcc libpq-dev && apt-get clean
+
+# Copie les dépendances Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
