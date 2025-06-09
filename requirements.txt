@@ -3,3 +3,4 @@ tabulate
 pytest
 flake8
 psycopg[c]
+uvicorn
