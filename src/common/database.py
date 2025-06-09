@@ -12,4 +12,12 @@ Base = declarative_base(metadata=MetaData(schema="lab2_schema"))
 
 
 def init_db():
+    with engine.connect() as conn:
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS lab2_schema"))
+    
+    
+    from magasin.models import Magasin, StockMagasin, Produit
+    from logistique.models import StockLogistique, DemandeApprovisionnement
+    from maison_mere.models import Vente
+    
     Base.metadata.create_all(bind=engine)
